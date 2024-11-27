@@ -9,7 +9,7 @@ This project is split into two main parts, printing and the web program. The for
 The web portion of this project uses a custom-modified version of [js-aruco](https://github.com/jcmellado/js-aruco), a port of [ArUco](http://www.uco.es/investiga/grupos/ava/node/26) to javascript.
 
 ## Web Scanner
-The in-browser scanner/translator can be found [here](https://legokidlogan.github.io/fiducial-fez/webcode/index.html) via github pages. As such, the html/js source code is not in this repo, but in [my github.io repo](https://github.com/legokidlogan/legokidlogan.github.io/fiducial-fez). Everything in this repo is of my own work, while the web portion uses [js-aruco](https://github.com/jcmellado/js-aruco) and its webcam example, heavily modifies the library and html to support Zuish letters and red/blue symbol detection, and adds new code for handling the translation and user input.
+The in-browser scanner/translator can be found [here](https://legokidlogan.github.io/fiducial-fez/webcode/index.html) via github pages. As such, the html/js source code is not in this repo, but in [my github.io repo](https://github.com/legokidlogan/legokidlogan.github.io/tree/main/fiducial-fez). Everything in this repo is of my own work, while the web portion uses [js-aruco](https://github.com/jcmellado/js-aruco) and its webcam example, heavily modifies the library and html to support Zuish letters and red/blue symbol detection, and adds new code for handling the translation and user input.
 
 **NOTE**: The web portion of this project is still being developed. Everything is being made public early for the sake of a progress update assignment. About one week remains until the project deadline.
 
