@@ -11,14 +11,48 @@ The web portion of this project uses a custom-modified version of [js-aruco](htt
 ## Web Scanner
 The in-browser scanner/translator can be found [here](https://legokidlogan.github.io/fiducial-fez/webcode/index.html) via github pages. As such, the html/js source code is not in this repo, but in [my github.io repo](https://github.com/legokidlogan/legokidlogan.github.io/tree/main/fiducial-fez). Everything in this repo is of my own work, while the web portion uses [js-aruco](https://github.com/jcmellado/js-aruco) and its webcam example, heavily modifies the library and html to support Zuish letters and red/blue symbol detection, and adds new code for handling the translation and user input.
 
-**NOTE**: The web portion of this project is still being developed. Everything is being made public early for the sake of a progress update assignment. About one week remains until the project deadline.
+The web scanner is able to translate messages made in Zuish using 3D-printed baseplates and tiles, via either webcam/back-camera live feed or uploaded images. It can also convert English messages into Zuish images, with an option to format it as if it were written using the physical pieces.
+
+When writing messages using the physical pieces, note that tiles on the edges between two adjacent baseplates will be part of the same word; baseplate boundaries do *not* act like a space character. Changing columns (or rows, if rotated into the English-readable position) behave as you might expect, i.e. being new lines.
 
 ## Red and Blue Symbols?
 This project uses more than just black and white for its fiducial markers. The English alphabet contains 26 letters, while Zuish only has 24 symbols. The letter pairs K and Q, and U and V have to share some symbols, leveraging context clues to determine what letter is being represented. For the sake of complete one-to-one translation, I have opted to distinguish these pairs with red and blue colors, while still using the same symbols.
 
-As such, when these symbols are encountered in white, they will be translated ambiguously as `(KQ)` or `(UV)`, but when red or blue are used, the exact letters will be translated.
+As such, when these shared symbols are encountered in white, they will be translated ambiguously as `(KQ)` or `(UV)`, but when red or blue are used, the exact letters will be translated.
 
-## Printing
+## Printable Objects
+There are three main types of printable objects in this project:
+
+1. Baseplates
+    - Prints in white, black, and some arbitrary third color.
+    - The third color is for a small plus sign in the top right.
+      - When connecting baseplates or taking pictures of them, rotate them so this plus is in the top right.
+      - Rotating the baseplate so that the plus is in the top left is the same as rotating your head to read FEZ's in-game messages in standard English format.
+    - Has nibs and holes to allow baseplates to be connected together.
+      - These need to be cleaned *very* thoroughly of supports once they're done being printed!
+    - Has a grid of slots for placing tiles into.
+      - Each slot has room for a small neodymium magnet, which can optionally be superglued in. Be careful with your magnet polarity!
+      - The magnets to use are 5x2mm, though the size can be adjusted in the grasshopper file.
+    - Default dimensions: 20x20x1cm, 8x8 grid, 64 magnets.
+2. Tiles
+    - Prints in white, then black. May also do red, then blue if those colors are needed.
+    - The amount of tiles, letters to use, and red & blue status can be adjusted in the grasshopper file.
+    - Each tile has a hole for a magnet.
+    - Remember, each symbol covers 4 letters, so you don't need a ton of copies per each individual letter.
+    - You'll likely need to remove wisps of filament and clean up some color boundaries once the print is done.
+    - Default dimensions: 1.4x1.4x1cm, 1 magnet.
+3. Translation Key
+    - Prints in white, black, red, then blue.
+    - A thin plate with each Zuish symbol and their rotations, along with their English letter counterparts.
+    - Hold the key horizontally and read the letters on the bottom to translate symbols 'as-is.'
+      - To read a sentence, it goes top->bottom, right->left.
+    - Hold the key vertically and read the letters on the bottom to transalte symbols 'as English-readable.'
+      - To read a sentence, it goes left->right, top->bottom.
+    - The grasshopper file has an option to only print in black and white if needed.
+    - Let the print fully cool off before you remove it from the bed, or it will warp!
+    - Default dimensions: 20.3x13.7x0.3cm.
+
+## Printing Process
 In order to operate as fiducial markers, the tiles need to use multiple colors. Most common consumer-level 3D printers don't have automatic filament-swapping features, and prominent slicers like Cura don't allow the level of sub-layer control this project needs. As such, the bulk of the prints will be handled in the traditional model->slicer->gcode workflow, with an additional step to generate gcode for the fiducial markers and filament changes.
 
 Admittedly, this new workflow isn't the cleanest, as it uses [lua 5.1/5.2](https://www.lua.org/) to generate the extra gcode instead of remaining entirely in [Rhino/Grasshopper](https://www.rhino3d.com/). Given more time, the lua portion could likely be moved to grasshopper. However, there would still be some back-and-forth with your slicer regardless, as seen later.
@@ -33,7 +67,7 @@ Once you're ready, follow these steps to prepare each print:
 2. Slice the models in Cura (or your slicer of choice).
 3. Make some slight adjustments to the end of the resulting gcode file, noted shortly later.
 4. Use [add_fez_gcode.lua](/printcode/lua/add_fez_gcode.lua) and the lua snippets from part 1 to generate the extra gcode.
-5. Insert the new gcode, as described below, and print. Prints will first use white filament, then black, and if needed, red and/or blue.
+5. Insert the new gcode, as described below, and print. Prints will first use white filament, then black, and if needed, red and/or blue. The baseplates instead do white, black, and some third color of your choice.
 
 
 The very end of gcode files generated by Cura typically look something like this:
@@ -102,5 +136,3 @@ Once you have the last-used X, Y, Z values, go to [add_fez_gcode.lua](/printcode
 To run the lua script, open a command prompt and use the `cd` command to navigate to the top-level folder of this repo in your local files. Then, use `lua52 ./printcode/lua/add_fez_gcode.lua`. Replace `lua52` with `lua51` if you installed lua 5.1, etc. It will then create a `test_out.txt` file with the gcode to be copied and pasted into the blank space you made earlier in the gcode file. Now you can start printing!
 
 Since not all printers support a gcode command to pause the print and wait for user input, whenever the print needs to change filament, it will rise up and move side-to-side to get your attention. When it does, use your printer's control interface to pause the print, cut the filament, swap the rolls, and extrude until the new filament is fully in. Then, resume the print and wait for the side-to-side to stop, where it will then release some filament in the air to ensure the nozzle is good to go (some printers suddenly eject filament when resuming a print, emptying the nozzle). While it does this, carefully collect the loose filament onto a folded paper towel and *gently* wipe the nozzle clean without disturbing its position.
-
-Something to note for the baseplates (the grids that tiles can be placed into), is they print in white, black, then an arbitrary third filament. The third filament is for a small plus sign in the top right corner, used for orienting the grid when taking pictures. You can use whatever color you want, but in my prints, I used orange.
